@@ -1,0 +1,12 @@
+{
+  "name": "@igon/http",
+  "version": "1.0.10",
+  "peerDependencies": {
+    "@angular/common": "^6.1.9",
+    "@angular/core": "^6.1.9"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0",
+    "@igon/helper": "^1.0.0"
+  }
+}
