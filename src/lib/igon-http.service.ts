@@ -62,9 +62,9 @@ export class IgonHttpService {
 
     return this.http.get(fullUrl,
       {withCredentials: true, ...options})
-    .pipe(
-      catchError((error) => this.handleError(error))
-    );
+      .pipe(
+        catchError((error) => this.handleError(error))
+      );
   }
 
   public sendPost(url: string, data: any = {}, params: any = {}, options: any = {}, hostName: string = null): Observable<any> {
@@ -77,9 +77,9 @@ export class IgonHttpService {
       {...this.getTokenParam()}),
       data,
       {withCredentials: true, ...options})
-    .pipe(
-      catchError((error) => this.handleError(error))
-    );
+      .pipe(
+        catchError((error) => this.handleError(error))
+      );
   }
 
   public sendPut(url: string, data: any = {}, params: any = {}, hostName: string = null): Observable<any> {
@@ -88,9 +88,9 @@ export class IgonHttpService {
     const host = hostName ? hostName : this.hostName;
 
     return this.http.put(host + this.combineParams(url, {...this.getTokenParam()}), data, {withCredentials: true})
-    .pipe(
-      catchError((error) => this.handleError(error))
-    );
+      .pipe(
+        catchError((error) => this.handleError(error))
+      );
   }
 
   public sendDelete(url: string, params: any = {}, hostName: string = null): Observable<any> {
@@ -99,9 +99,9 @@ export class IgonHttpService {
     const host = hostName ? hostName : this.hostName;
 
     return this.http.delete(host + this.combineParams(url, {...this.getTokenParam(), ...params}), {withCredentials: true})
-    .pipe(
-      catchError((error) => this.handleError(error))
-    );
+      .pipe(
+        catchError((error) => this.handleError(error))
+      );
   }
 
   private combineParams(url: string, params: any): string {

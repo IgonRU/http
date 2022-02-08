@@ -12,9 +12,7 @@ import {IgonHttpInterceptor} from './igon-http.interceptor';
     HttpClientModule
   ],
   providers: [],
-  exports: [
-    HttpClientModule
-  ]
+  exports: []
 })
 export class IgonHttpModule {
   constructor(private config: IgonHttpConfig,
@@ -40,6 +38,6 @@ export class IgonHttpModule {
           multi: true
         }
       ]
-    };
+    }
   }
 }

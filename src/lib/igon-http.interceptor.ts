@@ -6,7 +6,6 @@ import {Injectable, Optional, SkipSelf} from '@angular/core';
 import {catchError, switchMap, tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {IgonHttpConfig} from './igon-http-config';
-import {AppConfig} from '../../../../../src/app/config/app-config';
 
 @Injectable()
 export class IgonHttpInterceptor implements HttpInterceptor {
@@ -45,7 +44,7 @@ export class IgonHttpInterceptor implements HttpInterceptor {
     } else {
       this.stateService.tokenRefreshIsInProgress = true;
       if (this.configService.debugMode) console.log('Should ask for new token!');
-      return this.httpService.simpleGet('/jwt_token?refresh=' + this.stateService.refreshToken, {hostName: AppConfig.getSecurityApi()})
+      return this.httpService.simpleGet('/jwt_token?refresh=' + this.stateService.refreshToken, {hostName: this.configService.securityApi})
         .pipe(
           tap((response) => {
             this.stateService.tokenRefreshIsInProgress = false;
