@@ -8,6 +8,7 @@ import {IgonHttpErrorService} from './igon-http-error.service';
 import {FunctionsHelper} from '@igon/helper';
 import {IgonHttpResponse} from './igon-http-response';
 import {IgonHttpStateService} from './igon-http-state.service';
+import {IgonHttpRequestSettings, IgonHttpRequestSettingsLike} from './igon-http-request-settings';
 
 @Injectable()
 export class IgonHttpService {
@@ -19,6 +20,7 @@ export class IgonHttpService {
   set token(value: string) {
     this.httpState.token = value;
   }
+
   get token(): string {
     return this.httpState.token;
   }
@@ -62,9 +64,9 @@ export class IgonHttpService {
 
     return this.http.get(fullUrl,
       {withCredentials: true, ...options})
-      .pipe(
-        catchError((error) => this.handleError(error))
-      );
+    .pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
   public sendPost(url: string, data: any = {}, params: any = {}, options: any = {}, hostName: string = null): Observable<any> {
@@ -77,9 +79,9 @@ export class IgonHttpService {
       {...this.getTokenParam()}),
       data,
       {withCredentials: true, ...options})
-      .pipe(
-        catchError((error) => this.handleError(error))
-      );
+    .pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
   public sendPut(url: string, data: any = {}, params: any = {}, hostName: string = null): Observable<any> {
@@ -88,9 +90,9 @@ export class IgonHttpService {
     const host = hostName ? hostName : this.hostName;
 
     return this.http.put(host + this.combineParams(url, {...this.getTokenParam()}), data, {withCredentials: true})
-      .pipe(
-        catchError((error) => this.handleError(error))
-      );
+    .pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
   public sendDelete(url: string, params: any = {}, hostName: string = null): Observable<any> {
@@ -99,9 +101,9 @@ export class IgonHttpService {
     const host = hostName ? hostName : this.hostName;
 
     return this.http.delete(host + this.combineParams(url, {...this.getTokenParam(), ...params}), {withCredentials: true})
-      .pipe(
-        catchError((error) => this.handleError(error))
-      );
+    .pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
   private combineParams(url: string, params: any): string {
@@ -117,189 +119,111 @@ export class IgonHttpService {
     return {};
   }
 
-  simpleGet(url: string, settings = {}): Observable<IgonHttpResponse> {
-    let params = {};
-    let options = {};
-    let routeData = {};
-    let pending = null;
-    let hostName = null;
+  simpleGet(url: string, settings: IgonHttpRequestSettingsLike = {}): Observable<IgonHttpResponse> {
+    const requestSettings = new IgonHttpRequestSettings({
+      url,
+      method: 'GET',
+      ...settings
+    });
 
-    if (Object.getOwnPropertyDescriptor(settings, 'params')) {
-      params = settings['params'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'options')) {
-      options = settings['options'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'routeData')) {
-      routeData = settings['routeData'];
-      if (routeData) {
-        url = FunctionsHelper.parseTplUrl(url, {...routeData});
-      }
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'pending')) {
-      pending = settings['pending'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'hostName')) {
-      hostName = settings['hostName'];
-    }
-
-    if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+    const pending = requestSettings.get('pending');
+    if (pending) {
       pending.loading = true;
     }
-    return this.sendGet(url, params, options, hostName).pipe(
+
+    return this.sendGet(
+      requestSettings.parseUrl(),
+      requestSettings.get('params'),
+      requestSettings.get('options'),
+      requestSettings.get('hostName')
+    ).pipe(
       map(response => new IgonHttpResponse(response)),
       catchError((error) => {
         return throwError(error);
       }),
       finalize(() => {
-        if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+        if (pending) {
           pending.loading = false;
         }
       })
     );
   }
 
-  simplePost(url: string, settings = {}): Observable<IgonHttpResponse> {
-    let data = {};
-    let params = {};
-    let options = {};
-    let routeData = {};
-    let pending = null;
-    let hostName = null;
+  simplePost(url: string, settings: IgonHttpRequestSettingsLike = {}): Observable<IgonHttpResponse> {
+    const requestSettings = new IgonHttpRequestSettings(settings);
 
-    if (Object.getOwnPropertyDescriptor(settings, 'data')) {
-      data = settings['data'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'params')) {
-      params = settings['params'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'options')) {
-      options = settings['options'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'routeData')) {
-      routeData = settings['routeData'];
-      if (routeData) {
-        url = FunctionsHelper.parseTplUrl(url, {...routeData});
-      }
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'pending')) {
-      pending = settings['pending'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'hostName')) {
-      hostName = settings['hostName'];
-    }
-
-    if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+    const pending = requestSettings.get('pending');
+    if (pending) {
       pending.loading = true;
     }
-    return this.sendPost(url, data, params, options, hostName).pipe(
+
+    return this.sendPost(
+      requestSettings.parseUrl(url),
+      requestSettings.get('data'),
+      requestSettings.get('params'),
+      requestSettings.get('options'),
+      requestSettings.get('hostName')
+    ).pipe(
       map(response => new IgonHttpResponse(response)),
       catchError((error) => {
         return throwError(error);
       }),
       finalize(() => {
-        if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+        if (pending) {
           pending.loading = false;
         }
       })
     );
   }
 
-  simplePut(url: string, settings = {}): Observable<IgonHttpResponse> {
-    let data = {};
-    let params = {};
-    let routeData = {};
-    let pending = null;
-    let hostName = null;
+  simplePut(url: string, settings: IgonHttpRequestSettingsLike = {}): Observable<IgonHttpResponse> {
+    const requestSettings = new IgonHttpRequestSettings(settings);
 
-    if (Object.getOwnPropertyDescriptor(settings, 'data')) {
-      data = settings['data'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'params')) {
-      params = settings['params'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'routeData')) {
-      routeData = settings['routeData'];
-      if (routeData) {
-        url = FunctionsHelper.parseTplUrl(url, {...routeData});
-      }
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'pending')) {
-      pending = settings['pending'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'hostName')) {
-      hostName = settings['hostName'];
-    }
-
-    if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+    const pending = requestSettings.get('pending');
+    if (pending) {
       pending.loading = true;
     }
-    return this.sendPut(url, data, params, hostName).pipe(
+
+    return this.sendPut(
+      requestSettings.parseUrl(url),
+      requestSettings.get('data'),
+      requestSettings.get('params'),
+      requestSettings.get('hostName')
+    ).pipe(
       map(response => new IgonHttpResponse(response)),
       catchError((error) => {
         return throwError(error);
       }),
       finalize(() => {
-        if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+        if (pending) {
           pending.loading = false;
         }
       })
     );
   }
 
-  simpleDelete(url: string, settings = {}): Observable<IgonHttpResponse> {
-    let params = {};
-    let routeData = {};
-    let pending = null;
-    let hostName = null;
+  simpleDelete(url: string, settings: IgonHttpRequestSettingsLike = {}): Observable<IgonHttpResponse> {
+    const requestSettings = new IgonHttpRequestSettings(settings);
 
-    if (Object.getOwnPropertyDescriptor(settings, 'params')) {
-      params = settings['params'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'pending')) {
-      pending = settings['pending'];
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'routeData')) {
-      routeData = settings['routeData'];
-      if (routeData) {
-        url = FunctionsHelper.parseTplUrl(url, {...routeData});
-      }
-    }
-    if (Object.getOwnPropertyDescriptor(settings, 'hostName')) {
-      hostName = settings['hostName'];
-    }
-
-    if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+    const pending = requestSettings.get('pending');
+    if (pending) {
       pending.loading = true;
     }
 
-    return this.sendDelete(url, params, hostName).pipe(
+    return this.sendDelete(
+      requestSettings.parseUrl(url),
+      requestSettings.get('params'),
+      requestSettings.get('hostName')
+    ).pipe(
       map(response => new IgonHttpResponse(response)),
       catchError((error) => {
         return throwError(error);
       }),
       finalize(() => {
-        if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
+        if (pending) {
           pending.loading = false;
         }
       })
     );
   }
-
-  // simpleGet(url: string, params = {}, options = {}, pending = null): Observable<IgonHttpResponse> {
-  //   if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
-  //     pending.loading = true;
-  //   }
-  //   return this.sendGet(url, params, options).pipe(
-  //     map(response => new IgonHttpResponse(response)),
-  //     catchError((error) => {
-  //       return throwError(error);
-  //     }),
-  //     finalize(() => {
-  //       if (pending && Object.getOwnPropertyDescriptor(pending, 'loading')) {
-  //         pending.loading = false;
-  //       }
-  //     })
-  //   );
-  // }
 }
