@@ -112,14 +112,18 @@ export class IgonHttpRequestSettings implements IgonHttpRequestSettingsLike {
    * в формате объекта { key: value, key2: value2... }
    */
   getRequestDataCleared(): any {
-    const clearedData = {};
+    let clearedData = {};
     const excludedKeys = this.getTemplateKeys();
 
-    for (const key in this.requestData) {
-      //console.log('getRequestDataCleared key in this.requestData ', key, key in excludedKeys);
-      if (excludedKeys.filter(item => item === key).length === 0) {
-        clearedData[key] = this.requestData[key];
+    if (excludedKeys) {
+      for (const key in this.requestData) {
+        // console.log('getRequestDataCleared key in this.requestData ', key, excludedKeys);
+        if (excludedKeys.filter(item => item === key).length === 0) {
+          clearedData[key] = this.requestData[key];
+        }
       }
+    } else {
+      clearedData = { ...this.requestData };
     }
 
     //console.log('getRequestDataCleared excludedKeys, clearedData ', excludedKeys, clearedData);
