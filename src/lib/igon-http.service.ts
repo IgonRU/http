@@ -150,7 +150,11 @@ export class IgonHttpService {
   }
 
   simplePost(url: string, settings: IgonHttpRequestSettingsLike = {}): Observable<IgonHttpResponse> {
-    const requestSettings = new IgonHttpRequestSettings(settings);
+    const requestSettings = new IgonHttpRequestSettings({
+      url,
+      method: 'POST',
+      ...settings
+    });
 
     const pending = requestSettings.get('pending');
     if (pending) {
@@ -177,7 +181,11 @@ export class IgonHttpService {
   }
 
   simplePut(url: string, settings: IgonHttpRequestSettingsLike = {}): Observable<IgonHttpResponse> {
-    const requestSettings = new IgonHttpRequestSettings(settings);
+    const requestSettings = new IgonHttpRequestSettings({
+      url,
+      method: 'PUT',
+      ...settings
+    });
 
     const pending = requestSettings.get('pending');
     if (pending) {
@@ -203,7 +211,11 @@ export class IgonHttpService {
   }
 
   simpleDelete(url: string, settings: IgonHttpRequestSettingsLike = {}): Observable<IgonHttpResponse> {
-    const requestSettings = new IgonHttpRequestSettings(settings);
+    const requestSettings = new IgonHttpRequestSettings({
+      url,
+      method: 'DELETE',
+      ...settings
+    });
 
     const pending = requestSettings.get('pending');
     if (pending) {
