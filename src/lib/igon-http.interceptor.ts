@@ -2,9 +2,8 @@ import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/com
 import {Observable, of, Subject, throwError} from 'rxjs';
 import {IgonHttpService} from './igon-http.service';
 import {IgonHttpStateService} from './igon-http-state.service';
-import {Injectable, Optional, SkipSelf} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {catchError, switchMap, tap} from 'rxjs/operators';
-import {Router} from '@angular/router';
 import {IgonHttpConfig} from './igon-http-config';
 
 @Injectable()
@@ -15,8 +14,7 @@ export class IgonHttpInterceptor implements HttpInterceptor {
 
   constructor(private httpService: IgonHttpService,
               private stateService: IgonHttpStateService,
-              private configService: IgonHttpConfig,
-              private router: Router) {
+              private configService: IgonHttpConfig) {
     if (this.configService.debugMode) console.log('IgonHttpInterceptor constructor called!');
   }
 
